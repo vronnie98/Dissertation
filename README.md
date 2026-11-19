@@ -35,18 +35,43 @@ The settings for each step are written down in an analysis plan before any clust
 | File | What it is |
 |---|---|
 | `src/prepare_emscad.py` | Cleaning script for the current analysis |
+| `src/cluster_emscad.py` | Features (TF-IDF and sentence embeddings), K-Means, HDBSCAN, LDA, the fraudulent-vs-legitimate comparison and the stability checks. Tested on a small sample only; not yet run on the full data. |
+| `requirements.txt` | Package versions used |
 | `Classifier.py`, `Classifier.ipynb`, `Classifier_SMOTE.py`, `Classifier_SMOTE.ipynb` | Earlier baseline experiments: a fraud classifier using sentence embeddings and a Random Forest. Kept for reference; they are not part of the current analysis. |
 
 ## Running the cleaning step
 
-Developed with Python 3.12. Needs `pandas` and `pyarrow`.
+Developed with Python 3.12.
 
 ```
-pip install pandas pyarrow
+pip install -r requirements.txt
 python src/prepare_emscad.py --input fake_job_postings.csv
 ```
 
 It writes `data/processed/emscad_clean.parquet` (the cleaned adverts) and `results/prep_log.json` (counts of what was removed, for the Methods section). It does not change the original file.
+
+## Running the analysis steps
+
+**These steps have not been run on the full data yet.** Run them from the repository folder after the cleaning step. The first command is a safe test on a small random sample; it prints no results.
+
+```
+python src/cluster_emscad.py smoke
+```
+
+The steps, in order:
+
+```
+python src/cluster_emscad.py features     # TF-IDF representation
+python src/cluster_emscad.py kselect      # K-Means for k = 5 to 30, with stability and silhouette scores
+python src/cluster_emscad.py kmeans       # final model, theme words, fraudulent-vs-legitimate table
+python src/cluster_emscad.py hdbscan      # density-based clustering
+python src/cluster_emscad.py lda          # LDA comparison
+python src/cluster_emscad.py sensitivity  # reruns with other text and preprocessing choices
+python src/cluster_emscad.py balanced     # class-balanced check
+python src/cluster_emscad.py embed        # optional: sentence embeddings (needs sentence-transformers)
+```
+
+If the author's private analysis plan is present, the script refuses to run the real analysis until the plan has a lock date; without the plan file it skips that check.
 
 ## Ethics
 

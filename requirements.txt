@@ -1,0 +1,11 @@
+# Packages and versions used for the cleaning and analysis scripts (Python 3.12)
+numpy==2.5.4
+pandas==3.1.1
+scikit-learn==1.9.1
+scipy==1.18.1
+matplotlib==3.11.2
+pyarrow==26.0.1
+joblib==1.6.0
+
+# Optional: only needed for the sentence-embedding step (`embed`)
+# sentence-transformers
